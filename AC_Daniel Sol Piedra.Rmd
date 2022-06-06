@@ -1,0 +1,170 @@
+---
+title: "Análisis Clúster para estudiar los delitos en Estados Unidos"
+author: "Daniel Sol Piedra"
+date: "31/05/2022"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+editor options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduccón
+En la cultura popular, incluso la más reciente, recogida en series de gran éxito como “The Wire”, la sociedad estadounidense a menudo aparece plagada por la violencia y el crimen. Sin embargo, las estadísticas reflejan una mejora sustancial en la seguridad ciudadana durante la última década. De acuerdo con los datos del Departamento de Justicia, los crímenes violentos cayeron este año a su nivel más bajo desde 1973.
+
+La tendencia a la baja en el número de homicidios y actos violentos registrados por la policía se ha mantenido durante los dos últimos años contradiciendo las previsiones de muchos expertos, que se temían un estallido del crimen a causa de la crisis económica que vive el país, la peor desde la Gran Depresión de los años treinta.
+
+La reducción del crimen es especialmente espectacular en las tres mayores ciudades del país, y donde la sensación de inseguridad era mayor. En las dos últimas décadas, el número de homicidios cayó en Nueva York un 79%, pasando de las 2.245 muertes violentas del año 1990, a las 471 del 2009. En Chicago, la reducción es del 48%, pasando de 850 muertes a 458. Por su parte, en Los Ángeles, los homicidios cayeron un 68%, de 983 a 312.
+
+Estos cambios han provocado que la seguridad ciudadana haya desaparecido en las encuestas como una de las principales prioridades de los votantes, siendo reemplazada por nuevas demandas de seguridad ante otro tipo de amenaza: el terrorismo. De hecho, en las pasadas elecciones legislativas, apenas si se oyó hablar de seguridad ciudadana en la campaña electoral.
+
+Según los expertos, la caída del crimen se debe a varios factores. Por un lado, una mejor tecnología y metodología por parte de las autoridades policiales ha permitido un uso más eficiente de los recursos disponibles, y la aplicación de exitosas medidas de prevención. Además, se han llevado a cabo ambiciosas campañas contra algunas bandas de crimen organizado, a la vez que se apostaba por nuevos programas sociales destinados a los jóvenes de barrios marginales.
+
+Sin embargo, algunos factores no responden directamente a una política de las autoridades policiales. Por ejemplo, el boom económico de los años 90 ofreció nuevas posibilidades de trabajo a muchos jóvenes que podrían haberse decantado por la delincuencia ante la falta de expectativas. Igualmente, las luchas intestinas de hoy en día entre las mafias de la droga nada tienen que ver con las auténticas guerras motivadas por el control del “crack” en los años 80.
+
+La gran pregunta que se hacen muchos expertos es si estas mejoras son irreversibles, o en el futuro puede haber un repunte de la violencia. William Bratton, un especialista en seguridad que trabajó para los departamentos de policía de Nueva York y Los Angeles se muestra optimista sobre el futuro. “No veo [los homicidios y el crimen violento] volviendo a las cifras que vimos en el pasado”, sostiene Bratton, que considera que será clave evitar la llegada una nueva epidemia de droga como la del crack.
+
+**Descripción de la matriz de datos**
+Este base de datos es del año de 1973 y contiene estadísticas en arrestos por cada 100,000 habitantes por agrasión, asesinatos y violación en cada uno de los 50 estados de EE.UU. Tambien se proporciona el porcentaje de la población que vive en esas áreas urbanas. Por último esta base de datos se obtuvo del software estadíatico R.
+
+**Exploración de la matriz de datos**
+La base de datos a utilizar es de dimension 50 X 4 en donde se encuentran 50 observaciones de diversos estados de EE.UU y contiene 4 variables, como Asesinatos, asaltos, violación y porcentaje de población. Las cuatro variables son cuantitativas aunque de diferente escala, por lo que en el análisis se tienen que normalizar. No presenta Na´s o espacios vacíos.
+
+**Tratamiento de la matriz de datos**
+Se tienen que normalizar los datos para hacer posible la construccion del análisis clúster.
+
+## Metodología de análisis
+Para llevar a cabo el analisis clúster se toma la base de datos antes mencionada y se utilizan las librerias tales como tidyverse, cluster, factoextra, NbClust y tidr. El análisis clúster se llevo de la siguiente manera:
+
+1. Se cargan las librerias antes mencionadas para poder extraer la base de datos.
+2. Una vez cargadas las librerias lo que sigue es cargar la base de datos correspondiente.
+3. Como ya se mencionó, se normalizan las puntuaciones, ya que las variables de estudio están en diferente escala, es decir las variables no miden la misma caracteristica.
+4. Se crea un dendograma para poder apreciar visualmente cuantas agrupaciones es posble crear.
+5. Una vez creado el dendograma lo que sigue es utilizar el método de distancias euclidianas,para clacular la matriz de distancias.
+6. Mediante diversos métodos se logra crear el número de agrupaciones adecuada, ya que la mayoria de esos métodos proponen el mismo número adecuado.
+7. Ya conociendo el numero de las agrupaciones lo qu sigue es calcularlas, mediante el método de K-medias.
+8. Se realiza una representación gráfica de esas agrupaciones, en donde ya se puede apreciar las caracteríaticas de interés.
+9. Como último paso, se añaden las 50 observaciones a la agrupacion que le corresponda.
+
+
+## Resultados 
+
+## Análisis Clúster
+
+
+
+
+Cargamos las librerías necesarias para poder ejecutar nuestro analisis Clúster.
+```{r}
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+
+packages <- c("tidyverse","cluster", "factoextra","NbClust","tidyr")
+ipak(packages)
+```
+
+Visualizamos la base de datos que trae R Project en donde se analizan delitos, numero de muertos, entre otros, en diversas partes de los Estados Unidos.
+```{r pressure, echo=FALSE}
+df <- USArrests
+df
+
+```
+
+Como podemos darnos cuenta estan en diferente escala nuestras variables, por lo que es necesario normalizarlas para poder hacer su respectivo análsisis.
+```{r}
+#normalizar las puntuaciones
+df <- scale(df)
+head(df)
+```
+
+Creamos el dendograma para poder ver las agrupaciones que se podrian formar 
+```{r}
+res2 <- hcut(df, k = 2, stand = TRUE)
+fviz_dend(res2, rect = TRUE, cex = 0.5,
+          k_colors = c("red","#2E9FDF"))
+
+res4 <- hcut(df, k = 4, stand = TRUE)
+fviz_dend(res4, rect = TRUE, cex = 0.5,
+          k_colors = c("red","#2E9FDF","green","black"))
+```
+
+Es momento de calcular la matriz de diatancias en donde se usa el metodo de distancias euclidianas. Existen diversos métodos pero en este caso utilizaremos la antes mencionada
+```{r}
+#calcular la matriz de distacias
+m.distancia <- get_dist(df, method = "euclidean") #el método aceptado también puede ser: "maximum", "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman" o "kendall"
+```
+
+Se calcula el numero de clusters o agrupaciones adecuadas mediante el método slihouette, además de que existen diversos métodos.
+```{r}
+#estimar el número de clústers
+fviz_nbclust(df, kmeans, method = "silhouette")
+```
+
+Con la siguiente función se calculan las agrupaciones adecuadas mediante diversos métodos, al final se nos imprime cual es el numero mas adecuado segun los métodos.
+```{r}
+#con esta función se pueden calcular:
+#the index to be calculated. This should be one of : "kl", "ch", "hartigan", "ccc", "scott",
+#"marriot", "trcovw", "tracew", "friedman", "rubin", "cindex", "db", "silhouette", "duda",
+#"pseudot2", "beale", "ratkowsky", "ball", "ptbiserial", "gap", "frey", "mcclain", "gamma",
+#"gplus", "tau", "dunn", "hubert", "sdindex", "dindex", "sdbw", "all" (all indices except GAP,
+#Gamma, Gplus and Tau), "alllong" (all indices with Gap, Gamma, Gplus and Tau included).
+resnumclust<-NbClust(df, distance = "euclidean", min.nc=2, max.nc=10, method = "kmeans", index = "alllong")
+fviz_nbclust(resnumclust)
+
+```
+
+Como se puede observar, el número de agrupaciones adecuadas es 2, ahora lo que sigue es calcular esas dos agrupaciones.
+```{r}
+#calculamos los dos clústers
+k2 <- kmeans(df, centers = 2, nstart = 25)
+k2
+str(k2)
+```
+
+Una vez calculadas las dos agrupaciones, lo que sigue es representarlas en un grafico de K-means que es de utilidad para ver en que agrupacion estan distribuidos los estados de EUA.
+```{r}
+#plotear los cluster
+fviz_cluster(k2, data = df)
+fviz_cluster(k2, data = df, ellipse.type = "euclid",repel = TRUE,star.plot = TRUE) #ellipse.type= "t", "norm", "euclid"
+
+```
+
+Podemos decir que en la agrupacion dos se encuentran los lugares mas peligrosos de acuerdo a sus numero de incidentes, etc. Por otro lado, en el cluster 1 se encuentran los estados menos peligrosos, como Arizona, Michigan, entre otros.
+Por ultimo se pasan las agrupaciones a la base inicial para sus posteriores análisis:
+```{r}
+#pasar los cluster a mi df inicial para trabajar con ellos
+
+USArrests %>%
+  mutate(Cluster = k2$cluster) %>%
+  group_by(Cluster) %>%
+  summarise_all("mean")
+
+df <- USArrests
+df <- scale(df)
+df<- as.data.frame(df)
+df$clus<-as.factor(k2$cluster)
+head(df)
+
+df$clus<-factor(df$clus)
+data_long <- gather(df, caracteristica, valor, Murder:Rape, factor_key=TRUE)
+head(data_long)
+
+ggplot(data_long, aes(as.factor(x = caracteristica), y = valor,group=clus, colour = clus)) + 
+  stat_summary(fun = mean, geom="pointrange", size = 1)+
+  stat_summary(geom="line")
+```
+
+## Conclusiones
+Mediante el análisis clúster es posible agrupar a distintas poblaciones si se tienen variables cuantitativas, como puntuaciones, entre otros. Es de gran importancia para diversos investigadores ya que pueden agrupar sus poblaciones de estudio de acuerdo a sus propósitos y características de interés. Para este ejemplo práctico pudimos caracterizar de forma clara a cada uno de los estados de la base de datoa de acuerdoa a sus puntajes e cda una de sus variables, mediante el gráfico de K-medias podemos observar la agrupacion en donde se tienen a los estados con mayores índices delictivos y a los estadoa que más seguros son de acuerdo a nuestro análisis clúster.
+
+## Referencias
+Unidad Editorial Internet. (2010, 29 diciembre). *Los crímenes violentos caen a su nivel más bajo en Estados Unidos desde 1973 | Estados Unidos | elmundo.es*. El mundo. Recuperado 28 de mayo de 2022, de https://www.elmundo.es/america/2010/12/29/estados_unidos/1293641776.html
